@@ -55,12 +55,6 @@
         }
       });
 
-      window.addEventListener('beforeunload', function (e) {
-        e.preventDefault();
-        socket.emit('end', name);
-        e.returnValue = null;
-      });
-
       socket.on('chat message', function(usr, msg) {
         var item = document.createElement('li');
         messages.appendChild(item);
