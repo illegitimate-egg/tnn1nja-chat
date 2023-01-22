@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Tnn1nja Chat</title>
+    <meta charset="UTF-8">
+    <meta name="description" content="This is tnn1nja's custom discord chat. It isn't owned by tnn1nja. Silica Gel.">
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content="tnn1nja chat" />
+    <meta property="og:description" content="This is tnn1nja's custom discord chat. It isn't owned by tnn1nja. Silica Gel." />
+    <meta property="og:image" content="preview.png" />
+    <meta property="og:url" content="http://cameronpeck.co.uk/" />
+    <meta property="og:site_name" content="Tn1nnja chat" />
+
+    <meta name="twitter:title" content="tnn1nja chat">
+    <meta name="twitter:description" content="This is tnn1nja's custom discord chat. It isn't owned by tnn1nja. Silica Gel.">
+    <meta name="twitter:image" content="preview.png">
+    <meta name="twitter:site" content="@the_beanening">
+    <meta name="twitter:creator" content="@the_beanening">
+
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <style>
+      body { margin: 0; padding-bottom: 3rem; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; }
+
+      #form { background: rgba(0, 0, 0, 0.15); padding: 0.25rem; position: fixed; bottom: 0; left: 0; right: 0; display: flex; height: 3rem; box-sizing: border-box; backdrop-filter: blur(10px); }
+      #input { border: none; padding: 0 1rem; flex-grow: 1; border-radius: 2rem; margin: 0.25rem; }
+      #input:focus { outline: none; }
+      #form > button { background: #333; border: none; padding: 0 1rem; margin: 0.25rem; border-radius: 3px; outline: none; color: #fff; }
+
+      #messages { list-style-type: none; margin: 0; padding: 0; }
+      #messages > li { padding: 0.5rem 1rem; }
+      #messages > li:nth-child(odd) { background: #efefef; }
+    </style>
+  </head>
+  <body>
+    <ul id="messages"></ul>
+    <form id="form" action="">
+      <input id="input" autocomplete="off" /><button>Send</button>
+    </form>
+    <script src="/socket.io/socket.io.js"></script>
+    <script>
+      var socket = io();
+
+      var messages = document.getElementById('messages');
+      var form = document.getElementById('form');
+      var input = document.getElementById('input');
+
+      var name;
+
+      form.addEventListener('submit', function(e) {
+        e.preventDefault();
+        if (input.value) {
+          socket.emit('chat message', name, input.value);
+          input.value = '';
+        }
+      });
+
+      window.addEventListener('beforeunload', function (e) {
+        e.preventDefault();
+        socket.emit('end', name);
+        e.returnValue = null;
+      });
+
+      socket.on('chat message', function(usr, msg) {
+        var item = document.createElement('li');
+        messages.appendChild(item);
+        var name = document.createElement('strong');
+        name.textContent = usr;
+        item.appendChild(name);
+        var message = document.createElement('message');
+        message.textContent = ": " + msg;
+        item.appendChild(message);
+        window.scrollTo(0, document.body.scrollHeight);
+      });
+
+      socket.on('announcment', function(msg) {
+        var item = document.createElement('li');
+        messages.appendChild(item);
+        var bolded = document.createElement('strong');
+        bolded.textContent = msg;
+        item.appendChild(bolded);
+        window.scrollTo(0, document.body.scrollHeight);
+      });
+
+    if (typeof(Storage) !== "undefined") {
+        if (localStorage.name) {
+            socket.emit('user', localStorage.name);
+            name = localStorage.name;
+        } else {
+            var input = prompt("Enter a username.");
+            if (input == null) {
+                location.reload();
+            } else {
+                localStorage.setItem("name", input);
+                location.reload();
+            }
+        }
+    } else {
+        alert("Your browser is not supported.");
+        location.reload();
+    }
+    </script>
+  </body>
+</html>
